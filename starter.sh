@@ -203,6 +203,9 @@ db.sqlite3
 
 # media
 media/*
+
+# static
+static/*
 EOF
 cat >> $backend/.gitignore <<EOF
 # Byte-compiled / optimized / DLL files
@@ -309,6 +312,9 @@ db.sqlite3
 
 # media
 media/*
+
+# static
+static/*
 EOF
 docker-compose -f docker-compose-start.yml exec $backend python manage.py collectstatic
 
