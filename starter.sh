@@ -417,14 +417,13 @@ docker-compose build  #dev
 docker-compose up -d  #dev
 
 docker-compose exec $backend python manage.py shell -c "from django.contrib.auth.models import User; User.objects.create_superuser('admin', '', 'pass1234')"  #dev
-docker-compose exec $backend python manage.py collectstatic
+docker-compose exec $backend python manage.py collectstatic  #dev
 
 docker-compose exec $frontend ng build --prod --build-optimizer  #dev
 
 sed -i "" "s/# COPY [.]*/COPY $1/" $frontend/Dockerfile
 pg_version=$(docker-compose exec postgres postgres --version | sed -E 's/.*PostgreSQL[^0-9.]+([0-9.]*).*/\1/')
 sed -i "" "s/postgres:latest/postgres:$pg_version/" docker-compose.yml
-# TODO change docker-compose postgres service version
 docker-compose restart nginx  #dev
 
 docker-compose push
