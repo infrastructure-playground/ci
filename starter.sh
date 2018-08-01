@@ -1,15 +1,15 @@
-#!/bin/bash
+#!/bin/bash  #general
 
-docker login || exit 1
+docker login || exit 1  #general
 
 # value of variable below gets the second root folder and removes non-alphanumeric characters
 default_docker_organization=$(awk -F'/' 'NF>2{print $(NF-1)}' <<<"$PWD" | sed 's/[^a-zA-Z0-9]//g')
-default_backend_repository=django
-default_frontend_repository=angularjs
+default_backend_repository=django  #general
+default_frontend_repository=angularjs  #general
 
 read -p "Docker organization [$default_docker_organization]: " docker_organization
-read -p "Backend repository name [$default_backend_repository]: " backend_repository
-read -p "Frontend repository name [$default_frontend_repository]: " frontend_repository
+read -p "Backend repository name [$default_backend_repository]: " backend_repository  #general
+read -p "Frontend repository name [$default_frontend_repository]: " frontend_repository  #general
 
 organization=${docker_organization:-$default_docker_organization}
 backend=${backend_repository:-$default_backend_repository}
@@ -316,7 +316,6 @@ media/*
 # static
 static/*
 EOF
-docker-compose -f docker-compose-start.yml exec $backend python manage.py collectstatic
 
 sed -i "" "s/DEBUG = True//" $backend/project/settings.py
 sed -i "" "s/SECRET_KEY = '.*'//" $backend/project/settings.py
@@ -414,18 +413,18 @@ cat >> $frontend/.gitignore <<EOF
 .DS_Store
 EOF
 
-docker-compose build
-docker-compose up -d
+docker-compose build  #dev
+docker-compose up -d  #dev
 
-docker-compose exec django python manage.py shell -c "from django.contrib.auth.models import User; User.objects.create_superuser('admin', '', 'pass1234')"
+docker-compose exec $backend python manage.py shell -c "from django.contrib.auth.models import User; User.objects.create_superuser('admin', '', 'pass1234')"  #dev
+docker-compose exec $backend python manage.py collectstatic
 
-docker-compose exec angularjs ng build --prod --build-optimizer
-# docker-compose -f docker-compose-start.yml down
+docker-compose exec $frontend ng build --prod --build-optimizer  #dev
 
 sed -i "" "s/# COPY [.]*/COPY $1/" $frontend/Dockerfile
 pg_version=$(docker-compose exec postgres postgres --version | sed -E 's/.*PostgreSQL[^0-9.]+([0-9.]*).*/\1/')
 sed -i "" "s/postgres:latest/postgres:$pg_version/" docker-compose.yml
 # TODO change docker-compose postgres service version
-docker-compose restart nginx
+docker-compose restart nginx  #dev
 
 docker-compose push
