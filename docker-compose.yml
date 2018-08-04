@@ -5,7 +5,7 @@ services:
     image: infrastructureplayground/postgres:latest
     build: ./postgres
     volumes:
-      - ./data:/var/lib/postgresql/data
+      - ./postgres/data:/var/lib/postgresql/data
     env_file:
       - ./env/.postgres
       - ./env/.env
