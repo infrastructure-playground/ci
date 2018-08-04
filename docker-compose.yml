@@ -2,9 +2,10 @@ version: '3.6'
 services:
   postgres:
     restart: always
-    image: postgres:10.4
+    image: infrastructureplayground/postgres:latest
+    build: ./postgres
     volumes:
-      - ./postgres:/var/lib/postgresql/data
+      - ./data:/var/lib/postgresql/data
     env_file:
       - ./env/.postgres
       - ./env/.env
@@ -43,3 +44,4 @@ services:
       - 49153:49153
     volumes:
       - ./angularjs:/usr/src/app/
+

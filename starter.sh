@@ -332,6 +332,12 @@ cat >> $frontend/entrypoint.sh <<EOF
 ng build --watch --prod --build-optimizer && chmod u+x dist &
 ng serve --aot --host=0.0.0.0
 EOF
+cat >> $frontend/.dockerignore <<EOF
+.DS_Store
+EOF
+cat >> $frontend/.gitignore <<EOF
+.DS_Store
+EOF
 cat >> $frontend/Dockerfile <<EOF
 FROM $organization/$frontend:latest as project
 
@@ -368,7 +374,6 @@ sed -i "" 's|"outputPath": "dist/project"|"outputPath": "dist"|' $frontend/angul
 
 # Nginx starter script
 rm -rf nginx/conf.d/default.conf nginx/Dockerfile .dockerignore .gitignore
-nginx_version=$(docker-compose -f docker-compose-start.yml exec nginx nginx -v 2>&1 | sed 's/[^0-9.]//g')
 # 'EOF' is to avoid using $ as variable indicator but will be used as string instead
 cat >> nginx/conf.d/default.conf <<'EOF'
 server {
@@ -402,7 +407,7 @@ server {
 }
 EOF
 cat >> nginx/Dockerfile <<EOF
-FROM nginx:$nginx_version
+FROM nginx:latest
 
 ENV TZ Asia/Singapore
 COPY conf.d/. /etc/nginx/conf.d/
@@ -447,11 +452,14 @@ http {
 }
 EOF
 
-cat >> $frontend/.dockerignore <<EOF
-.DS_Store
-EOF
-cat >> $frontend/.gitignore <<EOF
-.DS_Store
+# Postgres starter script
+cat >> postgres/Dockerfile <<EOF
+FROM postgres:latest
+ENV PG_MAX_WAL_SENDERS 8
+ENV PG_WAL_KEEP_SEGMENTS 8
+COPY setup-replication.sh /docker-entrypoint-initdb.d/
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint-initdb.d/setup-replication.sh /docker-entrypoint.sh
 EOF
 
 docker-compose build  #dev
@@ -461,8 +469,13 @@ docker-compose exec $backend python manage.py collectstatic  #dev
 docker-compose exec $backend python manage.py shell -c "from django.contrib.auth.models import User; User.objects.create_superuser('admin', '', 'pass1234')"  #dev
 
 sed -i "" "s/# COPY [.]*/COPY $1/" $frontend/Dockerfile
+
+nginx_version=$(docker-compose exec nginx nginx -v 2>&1 | sed 's/[^0-9.]//g')
 pg_version=$(docker-compose exec postgres postgres --version | sed -E 's/.*PostgreSQL[^0-9.]+([0-9.]*).*/\1/')
-sed -i "" "s/postgres:latest/postgres:$pg_version/" docker-compose.yml
+
+
+sed -i "" "s/nginx:latest/nginx:$nginx_version/" nginx/Dockerfile
+sed -i "" "s/postgres:latest/postgres:$pg_version/" postgres/Dockerfile
 docker-compose restart nginx  #dev
 
 docker-compose push
