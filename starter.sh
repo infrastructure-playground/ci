@@ -203,9 +203,6 @@ db.sqlite3
 
 # media
 media/*
-
-# static
-static/*
 EOF
 cat >> $backend/.gitignore <<EOF
 # Byte-compiled / optimized / DLL files
@@ -312,9 +309,6 @@ db.sqlite3
 
 # media
 media/*
-
-# static
-static/*
 EOF
 
 sed -i "" "s/DEBUG = True//" $backend/project/settings.py
