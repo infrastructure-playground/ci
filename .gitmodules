@@ -10,3 +10,6 @@
 	path = nginx
 	url = https://github.com/infrastructure-playground/nginx.git
     branch = master
+[submodule "postgres"]
+	path = postgres
+	url = https://github.com/infrastructure-playground/postgres.git

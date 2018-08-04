@@ -24,5 +24,6 @@ sed -i "" "s/ping google.com/ng serve --aot --host=0.0.0.0/" $frontend/entrypoin
 docker-compose restart angularjs
 docker-compose exec $backend python manage.py collectstatic  #dev
 docker-compose exec $backend python manage.py shell -c "from django.contrib.auth.models import User; User.objects.create_superuser('admin', '', 'pass1234')"  #dev
-docker-compose exec $frontend ng build --prod --build-optimizer
+
+docker-compose restart postgres
 docker-compose restart nginx  #dev

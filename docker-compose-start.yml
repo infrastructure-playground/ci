@@ -10,19 +10,6 @@ services:
       - ./django:/usr/src/app/
     env_file:
       - ./env/.postgres
-  nginx:
-    restart: always
-    image: infrastructureplayground/nginx:latest
-    volumes:
-      - ./django/static:/usr/src/app/django/static
-      - ./django/media:/usr/src/app/django/media
-      - ./nginx/conf.d:/etc/nginx/conf.d
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile.start
-    ports:
-      - 8000:8000
-      - 80:80
   angularjs:
     restart: always
     image: infrastructureplayground/angularjs:latest
@@ -31,8 +18,3 @@ services:
       dockerfile: Dockerfile.start
     volumes:
       - ./angularjs:/usr/src/app/
-
-volumes:
-  backup-data:
-  # django-static:
-  # django-media:
