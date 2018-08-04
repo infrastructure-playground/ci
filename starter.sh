@@ -329,6 +329,7 @@ docker-compose -f docker-compose-start.yml exec $frontend ng new project --direc
 node_version=$(docker-compose -f docker-compose-start.yml exec $frontend node -v | sed 's/[^0-9.]//g')
 cat >> $frontend/entrypoint.sh <<EOF
 #!/bin/bash
+ng build --watch --prod --build-optimizer && chmod u+x dist &
 ng serve --aot --host=0.0.0.0
 EOF
 cat >> $frontend/Dockerfile <<EOF
@@ -406,6 +407,46 @@ FROM nginx:$nginx_version
 ENV TZ Asia/Singapore
 COPY conf.d/. /etc/nginx/conf.d/
 EOF
+cat >> nginx/nginx.conf <<EOF
+
+user  nginx;
+worker_processes  auto;
+worker_cpu_affinity auto;
+
+error_log  /var/log/nginx/error.log warn;
+pid        /var/run/nginx.pid;
+
+
+events {
+    worker_connections  1024;
+}
+
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+    # client_body_in_file_only on;
+    client_body_in_single_buffer on;
+
+    log_format  main  '{"Client-IP":$remote_addr, "Remote-User":$remote_user, "Time":[$time_local], "Request-Method":$request_method, '
+                      '"Host":$scheme://$host:$server_port, "Path":$request_uri "Status-Code":$status, "Body-Size":$body_bytes_sent, '
+                      '"Connection-Requests":$connection_requests, "Proxy-Response-Time":$request_time "HTTP-Referrer":$http_referer, '
+                      '"HTTP-User-Agent":$http_user_agent, "HTTP-X-Forwarded-For":$http_x_forwarded_for, '
+                      '"Request-Body": $request_body, "Authorization-Header": $http_Authorization}';
+
+    access_log  /var/log/nginx/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    keepalive_timeout  65;
+
+    gzip  on;
+
+    include /etc/nginx/conf.d/*.conf;
+}
+EOF
+
 cat >> $frontend/.dockerignore <<EOF
 .DS_Store
 EOF
@@ -418,8 +459,6 @@ docker-compose up -d  #dev
 
 docker-compose exec $backend python manage.py collectstatic  #dev
 docker-compose exec $backend python manage.py shell -c "from django.contrib.auth.models import User; User.objects.create_superuser('admin', '', 'pass1234')"  #dev
-
-docker-compose exec $frontend ng build --prod --build-optimizer  #dev
 
 sed -i "" "s/# COPY [.]*/COPY $1/" $frontend/Dockerfile
 pg_version=$(docker-compose exec postgres postgres --version | sed -E 's/.*PostgreSQL[^0-9.]+([0-9.]*).*/\1/')
