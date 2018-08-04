@@ -459,7 +459,7 @@ EOF
 docker-compose build  #dev
 docker-compose up -d  #dev
 
-docker-compose exec $backend python manage.py collectstatic  #dev
+docker-compose exec $backend python manage.py collectstatic
 docker-compose exec $backend python manage.py shell -c "from django.contrib.auth.models import User; User.objects.create_superuser('admin', '', 'pass1234')"  #dev
 
 sed -i "" "s/# COPY [.]*/COPY $1/" $frontend/Dockerfile
