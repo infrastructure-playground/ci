@@ -2,10 +2,12 @@ version: '3.6'
 services:
   postgres:
     restart: always
-    image: infrastructureplayground/postgres:latest
-    build: ./postgres
+    image: unnotech/postgres-replication:10.4
+    # image: infrastructureplayground/postgres:latest
+    # build: ./postgres
     volumes:
       - ./postgres/data:/var/lib/postgresql/data
+      # - ./postgres/docker-entrypoint.sh:/docker-entrypoint.sh
     env_file:
       - ./env/.postgres
       - ./env/.env
