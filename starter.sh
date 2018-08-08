@@ -341,7 +341,7 @@ FROM $organization/$frontend:latest as project
 
 FROM node:$node_version
 WORKDIR /usr/src/app
-EXPOSE 4200
+EXPOSE 4200 49153
 RUN apt-get update && \
     apt-get install vim -y && \
     npm install -g @angular/cli
