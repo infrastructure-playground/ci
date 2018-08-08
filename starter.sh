@@ -17,6 +17,8 @@ frontend=${frontend_repository:-$default_frontend_repository}
 
 docker pull python:3
 docker pull node:latest
+docker pull postgres:latest
+docker pull nginx:latest
 docker-compose -f docker-compose-start.yml build
 docker-compose -f docker-compose-start.yml up -d
 
