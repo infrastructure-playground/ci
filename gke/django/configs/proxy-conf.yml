@@ -7,12 +7,12 @@ data:
   default.conf: |+
     # limit_conn_zone $server_name zone=perserver:10m;
     upstream django {
-        server localhost:8000;
+        server django-backend:8000;
         keepalive 100;
     }
 
     server {
-        listen 8001;
+        listen 8000;
         server_name         localhost;
 
         gzip on;

@@ -5,8 +5,8 @@ metadata:
   namespace: default
 spec:
   backend:
-    serviceName: django-api
-    servicePort: 8081
+    serviceName: django-proxy
+    servicePort: 8000
   rules:
   - host: api.h6070.com
   - http:
@@ -14,7 +14,7 @@ spec:
       - path: /admin/*
         backend:
           serviceName: django-proxy
-          servicePort: 8001
+          servicePort: 8000
       - backend:
-          serviceName: django-api
-          servicePort: 8081
+          serviceName: django-cloud-endpoint
+          servicePort: 8000

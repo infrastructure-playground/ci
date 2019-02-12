@@ -1,0 +1,64 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    run: django-backend
+  name: django-backend
+  namespace: default
+spec:
+  minReadySeconds: 15
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      run: django-backend
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: django-backend
+    spec:
+      containers:
+      - name: django-backend
+        image: infrastructureplayground/django:master
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /healthcheck/
+            port: 8000
+            scheme: HTTP
+          initialDelaySeconds: 20
+          periodSeconds: 75
+          successThreshold: 1
+          timeoutSeconds: 15
+        ports:
+        - containerPort: 8000
+        resources:
+          limits:
+            cpu: "1"
+            memory: 6G
+          requests:
+            cpu: 300m
+            memory: 50M
+        envFrom:
+        - configMapRef:
+            name: shared-django-env-dependencies
+        volumeMounts:
+        - mountPath: /usr/src/app/storageBucketsBackendServiceKey.json
+          name: django-storage-bucket-credentials
+          readOnly: true
+          subPath: storageBucketsBackendServiceKey.json
+      volumes:
+        - name: service-account-creds
+          secret:
+            secretName: service-account-creds
+        - name: django-storage-bucket-credentials
+          secret:
+            defaultMode: 420
+            secretName: django-storage-bucket-credentials

@@ -31,32 +31,20 @@ spec:
           failureThreshold: 5
           httpGet:
             path: /healthcheck/
-            port: 8001
+            port: 8000
             scheme: HTTP
           initialDelaySeconds: 20
           periodSeconds: 240 # 240 is the max as it will add to 60
           successThreshold: 1
           timeoutSeconds: 15
         ports:
-        - containerPort: 8001
+        - containerPort: 8000
         volumeMounts:
         - name: django-proxy-conf
           mountPath: /etc/nginx/conf.d
         - name: shared-nginx-conf
           mountPath: /etc/nginx/nginx.conf
           subPath: nginx.conf
-      - name: django-admin
-        image: infrastructureplayground/django:master
-        ports:
-        - containerPort: 8000
-        envFrom:
-        - configMapRef:
-            name: shared-django-env-dependencies
-        volumeMounts:
-        - mountPath: /usr/src/app/storageBucketsBackendServiceKey.json
-          name: django-storage-bucket-credentials
-          readOnly: true
-          subPath: storageBucketsBackendServiceKey.json
       volumes:
         - name: django-proxy-conf
           configMap:
@@ -69,7 +57,3 @@ spec:
           configMap:
             name: shared-nginx-conf
             defaultMode: 420
-        - name: django-storage-bucket-credentials
-          secret:
-            defaultMode: 420
-            secretName: django-storage-bucket-credentials

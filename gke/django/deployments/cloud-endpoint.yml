@@ -1,0 +1,63 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    run: django-cloud-endpoint
+  name: django-cloud-endpoint
+  namespace: default
+spec:
+  minReadySeconds: 15
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      run: django-cloud-endpoint
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: django-cloud-endpoint
+    spec:
+      containers:
+      - name: django-cloud-endpoint
+        image: gcr.io/endpoints-release/endpoints-runtime:1
+        args: [
+          "--http_port=8000",
+          "--backend=django-proxy:8000",
+          "--service=django.endpoints.resources-practice.cloud.goog",
+          "--rollout_strategy=managed",
+          "--service_account_key=/etc/nginx/creds/service-account-creds.json"
+        ]
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /healthcheck/
+            port: 8000
+            scheme: HTTP
+          initialDelaySeconds: 20
+          periodSeconds: 240
+          successThreshold: 1
+          timeoutSeconds: 15
+        ports:
+        - containerPort: 8000
+        resources:
+          limits:
+            cpu: "1"
+            memory: 6G
+          requests:
+            cpu: 300m
+            memory: 50M
+        volumeMounts:
+          - mountPath: /etc/nginx/creds
+            name: service-account-creds
+            readOnly: true
+      volumes:
+        - name: service-account-creds
+          secret:
+            secretName: service-account-creds
