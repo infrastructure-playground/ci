@@ -4,6 +4,11 @@ resources:
   properties:
     storageClass: REGIONAL
     location: asia-east2
+    cors:
+    - origin: ["*"]
+      method: [GET]
+      responseHeader: [Content-Type]
+      maxAgeSeconds: 3600
     defaultObjectAcl:
     - bucket: {{ properties["bucketBackend"] }}
       entity: allUsers
@@ -37,8 +42,21 @@ resources:
       role: OWNER
     versioning:
      enabled: true
-    cors:
-    - origin: ["*"]
-      method: [GET]
-      responseHeader: [Content-Type]
-      maxAgeSeconds: 3600
+- name: {{ properties["bucketBackups"] }}
+  type: storage.v1.bucket
+  properties:
+    storageClass: REGIONAL
+    location: asia-east2
+    defaultObjectAcl:
+    - bucket: {{ properties["bucketBackups"] }}
+      entity: user-$(ref.storage-buckets-backend-sa.email)
+      email: $(ref.storage-buckets-backend-sa.email)
+      role: OWNER
+    lifecycle:
+      rule:
+      - action:
+          type: SetStorageClass
+          storageClass: COLDLINE
+        condition:
+          age: 30
+          isLive: true
