@@ -1,0 +1,30 @@
+{% set instanceName = properties['projectName']~"-"~properties['backendName']~"-"~2 %}
+
+resources:
+- name: {{ instanceName }}
+  type: gcp-types/sqladmin-v1beta4:instances
+  properties:
+    region: asia-east2
+    backendType: SECOND_GEN
+    databaseVersion: POSTGRES_9_6
+    settings:
+      availabilityType: ZONAL
+      tier: db-custom-1-3840
+      pricingPlan: PER_USE 
+      backupConfiguration:
+        enabled: true
+        startTime: "19:00" {# UTC TIME format #}
+- name: {{ properties["backendName"] }}
+  type: gcp-types/sqladmin-v1beta4:databases
+  properties:
+    instance: $(ref.{{ instanceName }}.name)
+    charset: utf8
+- name: {{ properties["userName"] }}
+  type: gcp-types/sqladmin-v1beta4:users
+  metadata:
+    dependsOn:
+       - {{ properties["backendName"] }}
+  properties:
+    instance: $(ref.{{ instanceName }}.name)
+    host: {{ properties["backendName"] }}
+    password: {{ properties["userName"] }}

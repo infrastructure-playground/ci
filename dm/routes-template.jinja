@@ -1,0 +1,5 @@
+resources:
+- name: {{ properties["projectName"] }}-route
+  type: compute.v1.route
+  properties: 
+  	network: $(ref.{{ properties["projectName"] }}-network.selfLink)

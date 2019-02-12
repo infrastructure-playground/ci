@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: django-proxy-conf
+  namespace: default
+data:
+  default.conf: |+
+    # limit_conn_zone $server_name zone=perserver:10m;
+    upstream django {
+        server localhost:8000;
+        keepalive 100;
+    }
+
+    server {
+        listen 8001;
+        server_name         localhost;
+
+        gzip on;
+        gzip_types '*';
+
+        location / {
+            # echo 'this text will come in response body with HTTP 200 after 5 seconds';
+            keepalive_timeout 100;
+            proxy_redirect off;
+            proxy_buffering off;
+            proxy_pass      http://django;
+            proxy_set_header Host $host:$server_port;
+            proxy_set_header X-Real-IP $http_x_forwarded_for;
+            proxy_set_header X-Forwarded-For $http_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+        }
+
+        location /static {
+            alias   /usr/src/app/django/static;
+        }
+
+        location /media {
+            alias   /usr/src/app/django/media;
+        }
+    }
+
+

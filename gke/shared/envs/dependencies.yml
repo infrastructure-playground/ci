@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shared-django-env-dependencies
+  namespace: default
+data:
+  DOCKERIZED: "True"
+  GKE: "True"
+  GS_BUCKET_NAME: resources-practice-backend-sb
+  POSTGRES_SERVICE: 127.0.0.1

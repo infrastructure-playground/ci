@@ -1,0 +1,91 @@
+imports:
+- path: subnets-template.jinja
+- path: networks-template.jinja
+- path: firewalls-template.jinja
+- path: serviceaccounts-template.jinja
+- path: storagebuckets-template.jinja
+# - path: cloudsql-template.jinja
+- path: gke-template.jinja
+
+resources:
+- name: networks
+  type: networks-template.jinja
+  properties:
+    projectName: resources-practice
+- name: subnets
+  type: subnets-template.jinja
+  properties:
+    projectName: resources-practice
+- name: firewalls
+  type: firewalls-template.jinja
+  properties:
+    projectName: resources-practice
+- name: serviceaccounts  # commend and then uncomment when adding more service accounts
+  type: serviceaccounts-template.jinja
+  properties:
+    projectName: resources-practice
+    serviceAccountKeys:  # Service Accounts where keys will be downloaded for access purposes
+      - name: storage-buckets-backend-sa
+      - name: gke-cloud-sql-sa
+      - name: gae-deploy-sa
+      - name: gke-deploy-sa
+      - name: endpoint-deploy-sa
+    iamMethod: add # replace to "remove" if in case you want to delete the added members using this deployment manager template
+    identities: # Check roles at https://cloud.google.com/iam/docs/understanding-roles
+      - role: roles/viewer
+        member_type: group  # can be "user" or "serviceAccount"
+        members: [manila@unnotech.com]
+      - role: roles/storage.admin
+        member_type: serviceAccount
+        members: [$(ref.storage-buckets-backend-sa.email), $(ref.gae-deploy-sa.email)]
+      - role: roles/storage.objectAdmin
+        member_type: serviceAccount
+        members: [$(ref.storage-buckets-backend-sa.email)]
+      - role: roles/cloudsql.client
+        member_type: serviceAccount
+        members: [$(ref.gke-cloud-sql-sa.email)]
+      - role: roles/editor
+        member_type: serviceAccount
+        members: [$(ref.gae-deploy-sa.email)]
+      - role: roles/appengine.deployer
+        member_type: serviceAccount
+        members: [$(ref.gae-deploy-sa.email)]
+      - role: roles/appengine.serviceAdmin
+        member_type: serviceAccount
+        members: [$(ref.gae-deploy-sa.email)]
+      - role: roles/container.admin  # "container" is GKE roles
+        member_type: serviceAccount
+        members: [$(ref.gke-deploy-sa.email)]
+      - role: roles/servicemanagement.admin
+        member_type: serviceAccount
+        members: [$(ref.endpoint-deploy-sa.email)]
+- name: storagebuckets
+  type: storagebuckets-template.jinja
+  properties:
+    projectName: resources-practice
+    bucketBackend: resources-practice-backend-sb
+    bucketAdmin: resources-practice-admin-sb
+    bucketSecrets: resources-practice-secrets-sb
+# - name: cloudsql
+#   type: cloudsql-template.jinja
+#   properties:
+#     projectName: resources-practice
+#     backendName: django
+#     userName: django_user
+- name: gke
+  type: gke-template.jinja
+  properties:
+    projectName: resources-practice
+
+# To echo data properties
+outputs:
+- name: storageBucketsBackendServiceKey
+  value: $(ref.storage-buckets-backend-sa-keys.privateKeyData)
+- name: gkeCloudSQLServiceKey
+  value: $(ref.gke-cloud-sql-sa-keys.privateKeyData)
+- name: gaeDeployServiceKey
+  value: $(ref.gae-deploy-sa-keys.privateKeyData)
+- name: gkeDeployServiceKey
+  value: $(ref.gke-deploy-sa-keys.privateKeyData)
+- name: endpointDeployServiceKey
+  value: $(ref.endpoint-deploy-sa-keys.privateKeyData)

@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress
+  namespace: default
+spec:
+  backend:
+    serviceName: django-api
+    servicePort: 8081
+  rules:
+  - host: api.h6070.com
+  - http:
+      paths:
+      - path: /admin/*
+        backend:
+          serviceName: django-proxy
+          servicePort: 8001
+      - backend:
+          serviceName: django-api
+          servicePort: 8081

@@ -1,0 +1,32 @@
+resources:
+- name: {{ properties["projectName"] }}-network-allow-ports-firewall
+  type: compute.v1.firewall
+  properties: 
+    network: $(ref.{{ properties["projectName"] }}-network.selfLink)
+    direction: INGRESS
+    {# Take note that not specifying "targetTags" allows "all instances in the network" #}
+    sourceRanges: ["0.0.0.0/0"]
+    allowed:
+    - IPProtocol: TCP
+      ports: ["22"]
+    - IPProtocol: TCP
+      ports: ["80"]
+    - IPProtocol: TCP
+      ports: ["81"]
+    - IPProtocol: TCP
+      ports: ["8000"]
+    - IPProtocol: ICMP
+- name: {{ properties["projectName"] }}-network-no-egress-firewall
+  type: compute.v1.firewall
+  properties: 
+    network: $(ref.{{ properties["projectName"] }}-network.selfLink)
+    direction: EGRESS
+    {# Take note that not specifying "targetTags" allows "all instances in the network" #}
+    {# sourceRanges: ["0.0.0.0/0"] There are no sourceRange in EGRESS direction #}
+    targetTags: ['no-egress']
+    denied:
+    - IPProtocol: TCP
+      ports: ["22"]
+    - IPProtocol: TCP
+      ports: ["80"]
+    - IPProtocol: ICMP

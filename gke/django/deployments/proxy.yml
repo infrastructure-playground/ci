@@ -1,0 +1,75 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    run: django-proxy
+  name: django-proxy
+  namespace: default
+spec:
+  minReadySeconds: 15
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      run: django-proxy
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: django-proxy
+    spec:
+      containers:
+      - name: django-proxy
+        image: nginx:1.15.8
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /healthcheck/
+            port: 8001
+            scheme: HTTP
+          initialDelaySeconds: 20
+          periodSeconds: 240 # 240 is the max as it will add to 60
+          successThreshold: 1
+          timeoutSeconds: 15
+        ports:
+        - containerPort: 8001
+        volumeMounts:
+        - name: django-proxy-conf
+          mountPath: /etc/nginx/conf.d
+        - name: shared-nginx-conf
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+      - name: django-admin
+        image: infrastructureplayground/django:master
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - configMapRef:
+            name: shared-django-env-dependencies
+        volumeMounts:
+        - mountPath: /usr/src/app/storageBucketsBackendServiceKey.json
+          name: django-storage-bucket-credentials
+          readOnly: true
+          subPath: storageBucketsBackendServiceKey.json
+      volumes:
+        - name: django-proxy-conf
+          configMap:
+            name: django-proxy-conf
+            defaultMode: 420
+            items:
+            - key: default.conf
+              path: default.conf
+        - name: shared-nginx-conf
+          configMap:
+            name: shared-nginx-conf
+            defaultMode: 420
+        - name: django-storage-bucket-credentials
+          secret:
+            defaultMode: 420
+            secretName: django-storage-bucket-credentials

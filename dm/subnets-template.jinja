@@ -1,0 +1,25 @@
+resources:
+- name: {{ properties["projectName"] }}-network-asia-east2-subnet
+  type: compute.v1.subnetwork
+  properties:
+    network: $(ref.{{ properties["projectName"] }}-network.selfLink)
+    ipCidrRange: 10.142.0.0/24  {# The IP addresses range of the VMs to be created #}
+    region: asia-east2
+- name: {{ properties["projectName"] }}-network-asia-east1-subnet
+  type: compute.v1.subnetwork
+  properties:
+    network: $(ref.{{ properties["projectName"] }}-network.selfLink)
+    ipCidrRange: 10.177.0.0/17
+    region: asia-east1
+- name: {{ properties["projectName"] }}-network-asia-east2-subnet-2
+  type: compute.v1.subnetwork
+  properties:
+    network: $(ref.{{ properties["projectName"] }}-network.selfLink)
+    ipCidrRange: 10.0.0.0/24
+    region: asia-east1
+- name: {{ properties["projectName"] }}-network-asia-northeast-subnet
+  type: compute.v1.subnetwork
+  properties:
+    network: $(ref.{{ properties["projectName"] }}-network.selfLink)
+    ipCidrRange: 192.168.0.0/24
+    region: asia-northeast1
