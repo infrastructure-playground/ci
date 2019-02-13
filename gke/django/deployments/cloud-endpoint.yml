@@ -32,7 +32,7 @@ spec:
           "--backend=django-proxy:8000",
           "--service=django.endpoints.resources-practice.cloud.goog",
           "--rollout_strategy=managed",
-          "--service_account_key=/etc/nginx/creds/service-account-creds.json"
+          "--service_account_key=/etc/nginx/creds/gkeCloudEndpointServiceKey.json"
         ]
         readinessProbe:
           failureThreshold: 5
@@ -55,9 +55,9 @@ spec:
             memory: 50M
         volumeMounts:
           - mountPath: /etc/nginx/creds
-            name: service-account-creds
+            name: django-endpoint-credentials
             readOnly: true
       volumes:
-        - name: service-account-creds
+        - name: django-endpoint-credentials
           secret:
-            secretName: service-account-creds
+            secretName: django-endpoint-credentials

@@ -1,0 +1,39 @@
+imports:
+- path: subnets-template.jinja
+- path: networks-template.jinja
+- path: firewalls-template.jinja
+- path: storagebuckets-template.jinja
+# - path: cloudsql-template.jinja
+- path: gke-template.jinja
+
+resources:
+- name: networks
+  type: networks-template.jinja
+  properties:
+    projectName: resources-practice
+- name: subnets
+  type: subnets-template.jinja
+  properties:
+    projectName: resources-practice
+- name: firewalls
+  type: firewalls-template.jinja
+  properties:
+    projectName: resources-practice
+- name: storagebuckets
+  type: storagebuckets-template.jinja
+  properties:
+    projectName: resources-practice
+    bucketBackend: resources-practice-backend-sb
+    bucketAdmin: resources-practice-admin-sb
+    bucketSecrets: resources-practice-secrets-sb
+    bucketBackups: resources-practice-backups-sb
+# - name: cloudsql
+#   type: cloudsql-template.jinja
+#   properties:
+#     projectName: resources-practice
+#     backendName: django
+#     userName: django_user
+- name: gke
+  type: gke-template.jinja
+  properties:
+    projectName: resources-practice

@@ -13,10 +13,6 @@ resources:
     - bucket: {{ properties["bucketBackend"] }}
       entity: allUsers
       role: READER
-    - bucket: {{ properties["bucketBackend"] }}
-      entity: user-$(ref.storage-buckets-backend-sa.email)
-      email: $(ref.storage-buckets-backend-sa.email)
-      role: OWNER
 - name: {{ properties["bucketAdmin"] }}
   type: storage.v1.bucket
   properties:
@@ -26,20 +22,11 @@ resources:
     - bucket: {{ properties["bucketAdmin"] }}
       entity: allUsers
       role: READER
-    - bucket: {{ properties["bucketAdmin"] }}
-      entity: user-$(ref.storage-buckets-backend-sa.email)
-      email: $(ref.storage-buckets-backend-sa.email)
-      role: OWNER
 - name: {{ properties["bucketSecrets"] }}
   type: storage.v1.bucket
   properties:
     storageClass: REGIONAL
     location: asia-east2
-    defaultObjectAcl:
-    - bucket: {{ properties["bucketSecrets"] }}
-      entity: user-$(ref.storage-buckets-backend-sa.email)
-      email: $(ref.storage-buckets-backend-sa.email)
-      role: OWNER
     versioning:
      enabled: true
 - name: {{ properties["bucketBackups"] }}
@@ -47,11 +34,6 @@ resources:
   properties:
     storageClass: REGIONAL
     location: asia-east2
-    defaultObjectAcl:
-    - bucket: {{ properties["bucketBackups"] }}
-      entity: user-$(ref.storage-buckets-backend-sa.email)
-      email: $(ref.storage-buckets-backend-sa.email)
-      role: OWNER
     lifecycle:
       rule:
       - action:

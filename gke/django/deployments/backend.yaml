@@ -55,9 +55,6 @@ spec:
           readOnly: true
           subPath: storageBucketsBackendServiceKey.json
       volumes:
-        - name: service-account-creds
-          secret:
-            secretName: service-account-creds
         - name: django-storage-bucket-credentials
           secret:
             defaultMode: 420
