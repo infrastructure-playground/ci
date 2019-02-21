@@ -58,7 +58,9 @@ data:
                           '"Host":$scheme://$host:$server_port, "Path":$request_uri "Status-Code":$status, "Body-Size":$body_bytes_sent, '
                           '"Connection-Requests":$connection_requests, "Proxy-Response-Time":$request_time "HTTP-Referrer":$http_referer, '
                           '"HTTP-User-Agent":$http_user_agent, "GCP-Stack-Trace":$http_x_cloud_trace_context, '
-                          '"Request-Body": $req_body_step_6, "Authorization-Header": $http_Authorization}';
+                          '"Request-Body": $req_body_step_6, "Authorization-Header": $http_Authorization, '
+                          '"X-Client-Geo-Loc-Region": $http_x_client_geo_loc_region, "X-Client-Geo-Loc-City": $http_x_client_geo_loc_city, "X-Client-Geo-Loc-Region-Subdivision": $http_x_client_geo_loc_region_subdivision, '
+                          '"X-Client-Geo-Loc-City-LatLong": $http_x_client_geo_loc_city_lat_long, "X-Client-RTT-Msec": $http_x_client_rtt_msec}';
 
         access_log  /var/log/nginx/access.log  main;
 
