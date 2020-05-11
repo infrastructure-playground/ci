@@ -3,17 +3,14 @@ services:
   postgres:
     restart: always
     image: unnotech/postgres-replication:10.4
-    # image: infrastructureplayground/postgres:latest
-    # build: ./postgres
     volumes:
       - ./postgres/data:/var/lib/postgresql/data
-      # - ./postgres/docker-entrypoint.sh:/docker-entrypoint.sh
     env_file:
       - ./env/.postgres
       - ./env/.env
   django:
     restart: always
-    image: infrastructureplayground/django:master
+    image: deanunnotech/django:master
     build: ./django
     volumes:
       - ./django:/usr/src/app/
@@ -37,21 +34,49 @@ services:
     env_file:
       - ./env/.env
     ports:
-      - target: 80
-        published: 80
+      - published: 80
+        target: 80
         mode: host
-      - target: 8000
-        published: 8000
+      - published: 8000
+        target: 8000
         mode: host
-  angularjs:
+  # angularjs:
+  #   restart: always
+  #   image: deanunnotech/angularjs:latest
+  #   build: ./angularjs
+  #   env_file:
+  #     - ./env/.env
+  #   ports:
+  #     - 4200:4200
+  #     - 49153:49153
+  #   volumes:
+  #     - ./angularjs:/usr/src/app/
+  vuejs:
     restart: always
-    image: infrastructureplayground/angularjs:latest
-    build: ./angularjs
+    image: deanunnotech/vuejs:latest
+    build: ./vuejs
     env_file:
       - ./env/.env
     ports:
-      - 4200:4200
-      - 49153:49153
+      - 3000:3000
     volumes:
-      - ./angularjs:/usr/src/app/
+      - ./vuejs:/usr/src/app/
+    entrypoint: /usr/src/app/dev-entrypoint.sh
+  # selenium-python:
+  #   restart: always
+  #   image: python:3.6.4
+  #   stdin_open: true
+  #   tty: true
+  #   volumes:
+  #     - ./selenium:/usr/src/app/
+  # selenium-firefox:
+  #   restart: always
+  #   image: selenium/standalone-firefox:3.141.59
+  #   volumes:
+  #     - /dev/shm:/dev/shm
+  # selenium-chrome:
+  #   restart: always
+  #   image: selenium/standalone-chrome:3.141.59
+  #   volumes:
+  #     - /dev/shm:/dev/shm
 
