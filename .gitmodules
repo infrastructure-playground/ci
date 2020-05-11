@@ -16,3 +16,8 @@
 [submodule "vuejs"]
 	path = vuejs
 	url = https://github.com/infrastructure-playground/vuejs.git
+	branch = master
+[submodule "selenium"]
+	path = selenium
+	url = https://github.com/infrastructure-playground/selenium.git
+	branch = master

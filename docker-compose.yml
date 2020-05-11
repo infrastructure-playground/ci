@@ -40,17 +40,17 @@ services:
       - published: 8000
         target: 8000
         mode: host
-  angularjs:
-    restart: always
-    image: deanunnotech/angularjs:latest
-    build: ./angularjs
-    env_file:
-      - ./env/.env
-    ports:
-      - 4200:4200
-      - 49153:49153
-    volumes:
-      - ./angularjs:/usr/src/app/
+  # angularjs:
+  #   restart: always
+  #   image: deanunnotech/angularjs:latest
+  #   build: ./angularjs
+  #   env_file:
+  #     - ./env/.env
+  #   ports:
+  #     - 4200:4200
+  #     - 49153:49153
+  #   volumes:
+  #     - ./angularjs:/usr/src/app/
   vuejs:
     restart: always
     image: deanunnotech/vuejs:latest
@@ -62,4 +62,21 @@ services:
     volumes:
       - ./vuejs:/usr/src/app/
     entrypoint: /usr/src/app/dev-entrypoint.sh
+  # selenium-python:
+  #   restart: always
+  #   image: python:3.6.4
+  #   stdin_open: true
+  #   tty: true
+  #   volumes:
+  #     - ./selenium:/usr/src/app/
+  # selenium-firefox:
+  #   restart: always
+  #   image: selenium/standalone-firefox:3.141.59
+  #   volumes:
+  #     - /dev/shm:/dev/shm
+  # selenium-chrome:
+  #   restart: always
+  #   image: selenium/standalone-chrome:3.141.59
+  #   volumes:
+  #     - /dev/shm:/dev/shm
 
